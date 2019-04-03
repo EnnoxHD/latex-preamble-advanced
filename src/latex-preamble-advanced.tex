@@ -24,7 +24,16 @@
     automark                % chapter and section names in header
 ]{scrbook}                  % base document is book
 
+%--- monochrome setting for print ---%
+\newcommand{\true}{1}
+\newcommand{\false}{0}
+\newcommand{\isdigital}{\true} % \true (digital pdf) or \false (monochrome print version)
+
 %--- packages ---%
+\if\isdigital\false
+    \usepackage[monochrome]{color}
+\fi
+
 \usepackage{scrhack}            % improved compatibility for KOMA-Script with float and babel
 \usepackage[utf8]{inputenc}     % encoding of the input files
 \usepackage[T1]{fontenc}        % internal charset
@@ -45,13 +54,14 @@
 \usepackage{float}              % floating environments and options
 \usepackage{caption}            % formatting captions
 \usepackage{longtable}          % for multipage tables
+\usepackage{svg}                % for including svg files
 \usepackage{graphicx}           % for including graphics
-\usepackage[
-    usenames,
-    dvipsnames,
-    table,
-    xcdraw
-]{xcolor}             % define and use colors
+% \usepackage[
+%     usenames,
+%     dvipsnames,
+%     table,
+%     xcdraw
+% ]{xcolor}             % define and use colors
 \usepackage{scrlayer-scrpage}   % page header and footer
 \usepackage[
     marginal,
@@ -81,6 +91,7 @@
 \usepackage{enumitem} % includes enumerate package
 \usepackage{pdfpages} % for including pdf pages into the document
 \usepackage{afterpage} % command execution after next page break
+\usepackage{acronym} % for acronyms list and ref in text
 \usepackage{blindtext} % FOR TESTING PURPOSES ONLY
 
 %--- constants ---%
@@ -124,6 +135,9 @@
 \setlength{\abovecaptionskip}{10pt}
 \setlength{\belowcaptionskip}{15pt}
 
+% setup floating environment [h] height
+\setlength{\intextsep}{15pt}
+
 %--- workarounds ---%
 % footmisc and hyperref: multiple
 \let\oldFootnote\footnote
@@ -154,7 +168,12 @@
   \hl{#2}
   \endgroup
 }
-\newcommand{\inlinecode}[1]{\inlinecodetext{lightgrey}{\texttt{ #1 }}}
+% \newcommand{\inlinecodecolor}{\if\isdigital\true lightgrey\else white\fi}
+\if\isdigital\true
+    \newcommand{\inlinecode}[1]{\inlinecodetext{lightgrey}{\texttt{ #1 }}}
+\else
+    \newcommand{\inlinecode}[1]{\texttt{ #1 }}
+\fi
 
 % define code environment
 \newcounter{codectr}\setcounter{codectr}{0}
@@ -162,7 +181,8 @@
     \captionsetup{type=listing,font=small,labelfont=bf,skip=0pt}
     \refstepcounter{codectr}
 }{}
-\SetupFloatingEnvironment{listing}{name=Quellcode}
+\newfloat{code}{H}{code}[chapter]
+\floatname{code}{Quellcode}
 
 % define column width
 % dependencies: array
@@ -333,12 +353,13 @@ $\blacksquare$\\
 
 %Abkürzungsverzeichnis
 \setindexpreamble{Alle \textbf{fett} gedruckten Seitenzahlen sind Referenzen auf die Definition des jeweiligen Begriffs. Demgegenüber geben normal gedruckte Seitenzahlen die Seiten der Verwendung des jeweiligen Begriffs wieder.\par \bigskip}
-\listoffigures
-%\listof{figure}{Abbildungsverzeichnis}
-\listoftables
-%\listof{table}{Tabellenverzeichnis}
-%\listof{code}{Quellcodeverzeichnis}
+%\listoffigures
+\listof{figure}{Abbildungsverzeichnis}
+%\listoftables
+\listof{table}{Tabellenverzeichnis}
+\listof{code}{Quellcodeverzeichnis}
 %Quellen-/Literaturverzeichnis
+% \nocite{*} % display all references without mentioning them in the text
 \printbibliography[title=Quellenverzeichnis]
 \setbibpreamble{Die Literaturangaben sind alphabetisch nach den Namen der Autoren sortiert. Bei mehreren Autoren wird nach dem ersten Autor sortiert.\par\bigskip}
 %Stichwortverzeichnis
