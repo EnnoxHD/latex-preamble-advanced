@@ -92,6 +92,7 @@
 \usepackage{pdfpages} % for including pdf pages into the document
 \usepackage{afterpage} % command execution after next page break
 \usepackage{acronym} % for acronyms list and ref in text
+\usepackage{makeidx} % for indexing words
 \usepackage{blindtext} % FOR TESTING PURPOSES ONLY
 
 %--- constants ---%
@@ -138,6 +139,10 @@
 % setup floating environment [h] height
 \setlength{\intextsep}{15pt}
 
+% setup index
+\makeindex
+\AtBeginDocument{\renewcommand{\indexname}{Stichwortverzeichnis}}
+
 %--- workarounds ---%
 % footmisc and hyperref: multiple
 \let\oldFootnote\footnote
@@ -146,8 +151,6 @@
     \oldFootnote{#1}\futurelet\nextToken\isFootnote}
 \newcommand\isFootnote{%
     \ifx\footnote\nextToken\textsuperscript{,}\fi}
-
-
 
 %--- own commands ---%
 % command
@@ -194,6 +197,9 @@
 % dependencies: tikz
 \newcommand*\circled[1]{\tikz[baseline=(char.base)]{
             \node[shape=circle,draw,inner sep=1.5pt] (char) {#1};}}
+            
+% readable indexing with \Index{...}, no duplicate words
+\newcommand{\Index}[1]{#1\index{#1}}
 
 %--- document information ---%
 \subject{Thema}
@@ -210,6 +216,11 @@
 
 \maketitle
 \tableofcontents
+
+\addchap{Abkürzungsverzeichnis}
+\begin{acronym}[LargestWord]
+    \acro{ABC}{Alphabet}
+\end{acronym}
 
 \onehalfspacing
 \addchap{Abstract}
@@ -251,7 +262,7 @@ ENDSELECT.
 FORM print_person
     USING f_zpersonen LIKE ZPERSONEN
           f_nummer LIKE i.
-
+          
 *   * Ausgabe der Daten auf der Konsole *
     WRITE:/ f_nummer, '. ',
             f_zpersonen-vorname, ' ',
@@ -272,9 +283,9 @@ ENDFORM.
 \subsubsection{Unterunterabschnitt}
 \blindtext % FOR TESTING PURPOSES ONLY
 \begin{itemize}
-    \item blah
+    \item \Index{blah}
     \begin{itemize}
-        \item blah
+        \item blah \acs{ABC}
         \begin{itemize}
             \item blah
             \begin{itemize}
@@ -334,14 +345,14 @@ $\blacksquare$\\
 
 \afterpage{
     \newgeometry{margin=0.25cm}
-
+    
     \begin{figure}[H]
         \centering
         \includegraphics[angle=90,scale=0.5]{test.png}
         \caption{Zeitplan für die Thesis}
         \label{zeitplan}
     \end{figure}
-
+    
     \clearpage
     \restoregeometry
 }\restoregeometry\newpage
@@ -353,13 +364,13 @@ $\blacksquare$\\
 
 %Abkürzungsverzeichnis
 \setindexpreamble{Alle \textbf{fett} gedruckten Seitenzahlen sind Referenzen auf die Definition des jeweiligen Begriffs. Demgegenüber geben normal gedruckte Seitenzahlen die Seiten der Verwendung des jeweiligen Begriffs wieder.\par \bigskip}
+\printindex
 %\listoffigures
 \listof{figure}{Abbildungsverzeichnis}
 %\listoftables
 \listof{table}{Tabellenverzeichnis}
 \listof{code}{Quellcodeverzeichnis}
 %Quellen-/Literaturverzeichnis
-% \nocite{*} % display all references without mentioning them in the text
 \printbibliography[title=Quellenverzeichnis]
 \setbibpreamble{Die Literaturangaben sind alphabetisch nach den Namen der Autoren sortiert. Bei mehreren Autoren wird nach dem ersten Autor sortiert.\par\bigskip}
 %Stichwortverzeichnis
